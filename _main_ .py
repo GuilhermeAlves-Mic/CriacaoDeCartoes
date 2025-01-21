@@ -20,7 +20,6 @@ def criar_fields(fields_dict):
     fields = "&".join([f"FIELDS[{key}]={value}" for key, value in fields_dict.items()])
     return fields
     
-
 class Aut_Cartao:
     def criarCartao(self):
         self.CentrodeCusto = self.CC.get()
@@ -125,7 +124,40 @@ class Aut_Cartao:
             print(f"Erro ao criar o cartão: {str(e)}")
             traceback.print_exc()
 
+    def exibirListaCartoes(self):
+        contagem =+1
+
+        if contagem < 2:
+
+            self.CentrodeCusto = self.CC.get()
+            self.AtualFase = self.Fase.get()  # Certifique-se de que é string
+            self.especialidadeValor = self.especialidade.get()
+            self.referencia = self.equipSoft.get()
+
+
+            if self.especialidadeValor == "Controle":
+                self.entrega = "Software"
+            else:
+                self.entrega = self.especialidade.get()
+
+            self.card_titles = f"{self.CentrodeCusto}-FASE0{self.AtualFase}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
+
+            self.task_listbox.delete(0, tk.END)  # Limpar Listbox
+            for title in self.card_titles:
+                self.task_listbox.insert(tk.END, title)
+
+            if self.card_titles:
+                lista_cartoes = "\n".join(self.card_titles)
+                messagebox.showinfo("Lista de Cartões", f"Títulos dos cartões criados:\n{lista_cartoes}")
+            else:
+                messagebox.showinfo("Lista de Cartões", "Nenhum cartão foi criado ainda.")
+
+        else:
+            print("Asteca")
+
     def tela(self):
+
+        self.card_titles = []
         self.janela = ThemedTk(theme="winxpblue")
         self.janela.title("Criação de Cartões")
         self.janela.geometry("800x600")
@@ -210,6 +242,13 @@ class Aut_Cartao:
         # Botão para criar o cartão
         criar = ttk.Button(self.janela, text="Criar Cartão", command=self.criarCartao, width=20)
         criar.place(x=650, y=410)
+
+        exibir = ttk.Button(self.janela, text="Exibir Lista de Cartões", command=self.exibirListaCartoes, width=20)
+        exibir.place(x=650, y=460)
+
+        tk.Label(self.janela, text="Tarefas Criadas:", font="Arial 10 bold", wraplength=500, anchor="w", justify="left").place(x=400, y=20)
+        self.task_listbox = tk.Listbox(self.janela, width=50, height=20) 
+        self.task_listbox.place(x=400, y=50)
 
 objeto = Aut_Cartao()
 objeto.tela()
