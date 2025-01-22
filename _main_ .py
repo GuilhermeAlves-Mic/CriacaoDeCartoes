@@ -23,12 +23,12 @@ def criar_fields(fields_dict):
 class Aut_Cartao:
     def criarCartao(self):
         self.CentrodeCusto = self.CC.get()
-        self.Fase = str(self.Fase.get())  # Certifique-se de que é string
+        self.Fasee = str(self.Fase.get())  # Certifique-se de que é string
         self.especialidadeValor = self.especialidade.get()
         self.referencia = self.equipSoft.get()
-        self.data_inicio = self.data_inicio.get_date()
-        self.data_fechamento = self.data_fechamento.get_date()
-        self.prazo = self.prazo.get_date()
+        self.data_inicioo = self.data_inicio.get_date()
+        self.data_fechamentoo = self.data_fechamento.get_date()
+        self.prazoo = self.prazo.get_date()
         self.responsavel = self.responsavel.get()
 
         if self.colaborador:
@@ -38,7 +38,7 @@ class Aut_Cartao:
             messagebox.showerror("Erro", "Centro de Custo deve ser uma string.")
             return
 
-        if not isinstance(self.Fase, str):
+        if not isinstance(self.Fasee, str):
             messagebox.showerror("Erro", "Fase deve ser uma string.")
             return
 
@@ -49,83 +49,87 @@ class Aut_Cartao:
             self.entrega = self.especialidade.get()
             self.especialidadeValor = "ESW003-Software_Interface-SP"
 
-
-        title = f"{self.CentrodeCusto}-FASE0{self.Fase}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
+        title = f"{self.CentrodeCusto}-FASE0{self.Fasee}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
         description = f"E%23{self.entrega} R%23{self.referencia}"
         print(f"O ID selecionado foi: {self.id_selecionado.get()}")
 
+        if not self.task_vector:
+            title = f"{self.CentrodeCusto}-FASE0{self.Fase}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
+            description = f"E%23{self.entrega} R%23{self.referencia}"
+            self.card_dict = {
+                "CREATED_BY": "1",
+                "TITLE": title,
+                "GROUP_ID": "2",
+                "DESCRIPTION": description,
+                "START_DATE_PLAN": self.data_inicioo,
+                "END_DATE_PLAN": self.data_fechamentoo,
+                "DEADLINE": self.prazoo,
+                "RESPONSIBLE_ID": self.id_selecionado.get()
+            }
+            self.task_vector = [self.card_dict]
 
-        self.card_dict = {
-            "CREATED_BY": "1",
-            "TITLE": title,
-            "GROUP_ID": "2",
-            "DESCRIPTION": description,
-            "START_DATE_PLAN": self.data_inicio,
-            "END_DATE_PLAN": self.data_fechamento,
-            "DEADLINE": self.prazo,
-            "RESPONSIBLE_ID": self.id_selecionado.get()
-        }
+    # Iterar sobre self.task_vector para criar as tarefas
+        for task in self.task_vector:
+            try:
+                print(f"Criando a tarefa: {task['TITLE']}")
+                url_tarefa = f"{urlAPI}/task.item.add.json?{criar_fields(task)}"
+                response = requests.get(url_tarefa)
 
-        try:
-            print("Criando a tarefa...")
-            url_tarefa = f"{urlAPI}/task.item.add.json?{criar_fields(self.card_dict)}"
-            response = requests.get(url_tarefa)
+                if response.status_code == 200:
+                    try:
+                        dadosTotal = response.json()
+                        print(f"Resposta da API: {dadosTotal}")
+                        result = dadosTotal.get("result", {})
+                        if isinstance(result, int):
+                            task_id_value = result
+                            task_id_value = int(task_id_value)
+                            print(f"Tarefa criada com sucesso. ID da tarefa: {task_id_value}")
 
-            if response.status_code == 200:
-                try:
-                    dadosTotal = response.json()
-                    print(f"Resposta da API: {dadosTotal}")
-                    result = dadosTotal.get("result", {})
-                    if isinstance(result, int):
-                        task_id_value = result
-                        task_id_value = int(task_id_value)
-                        print(f"Tarefa criada com sucesso. ID da tarefa: {task_id_value}")
+                            # Itens do checklist a serem adicionados
+                            if self.entrega == "Software":
+                                checklist_items = ["#501 - Estudo Tecnico", "#102 - Especificação", "#103 - Manual", 
+                                                   "#104 - Tabela de Variaveis / Roteiro de Testes",  
+                                                   "#105 - Desenvolvimento", "#106 - Teste Funcional / Teste Unitario"]
+                            elif self.entrega == "IHM":
+                                checklist_items = ['#501 - Estudo Tecnico', '#202 - Manual', '#203 - Desenvolvimento', '#204 - Teste Funcional']
+                            elif self.entrega == "Supervisão":
+                                checklist_items = ["#501 - Estudo Tecnico", "#402 - Telas", "#403 - Drivers", "#404 - Bibliotecas", "#405 - Setup"]
+                            elif self.entrega == "G5":
+                                checklist_items = ["#501 - Estudo Tecnico", "#302 - Bibliotecas", "#303 - Modelos de Escrita", "#304 - Instancia", "#305 - Teste Funcional"]
 
-                        # Itens do checklist a serem adicionados
-                        if self.entrega == "Software":
-                            checklist_items = ["#501 - Estudo Tecnico", "#102 - Especificação", "#103 - Manual" "#104 - Tabela de Variaveis / Roteiro de Testes",  
-                                               "#105 - Desenvolvimento", "#106 - Teste Funcional / Teste Unitario"]
-                        elif self.entrega == "IHM":
-                            checklist_items = ['#501 - Estudo Tecnico', '#202 - Manual', '#203 - Desenvolvimento', '#204 - Teste Funcional']
-                        elif self.entrega == "Supervisão":
-                            checklist_items = ["#501 - Estudo Tecnico", "#402 - Telas", "#403 - Drivers", "#404 - Bibliotecas", "#405 - Setup"]
-                        elif self.entrega == "G5":
-                            checklist_items = ["#501 - Estudo Tecnico", "#302 - Bibliotecas", "#303 - Modelos de Escrita", "#304 - Instancia","#305 - Teste Funcional"]
-
-                        # Loop para adicionar os itens do checklist
-                        for item in checklist_items:
-                            checklist_dict = {
-                                "taskId": task_id_value,  # O Bitrix espera "taskId" no corpo
-                                "fields": {         # Campos adicionais dentro de "fields"
-                                    "TITLE": item
+                            # Loop para adicionar os itens do checklist
+                            for item in checklist_items:
+                                checklist_dict = {
+                                    "taskId": task_id_value,  # O Bitrix espera "taskId" no corpo
+                                    "fields": {  # Campos adicionais dentro de "fields"
+                                        "TITLE": item
+                                    }
                                 }
-                            }
+                                # Endpoint da API
+                                url_checklist = f"{urlAPICheck}/task.checklistitem.add.json"
 
-                            # Endpoint da API
-                            url_checklist = f"{urlAPICheck}/task.checklistitem.add.json"
+                                # Enviando como POST com JSON no corpo
+                                response_checklist = requests.post(url_checklist, json=checklist_dict)
 
-                            # Enviando como POST com JSON no corpo
-                            response_checklist = requests.post(url_checklist, json=checklist_dict)
-
-                            # Verificar a resposta
-                            if response_checklist.status_code == 200:
-                                dados_checklist = response_checklist.json()
-                                if "result" in dados_checklist:
-                                    print(f"Checklist item '{item}' adicionado com sucesso!")
+                                # Verificar a resposta
+                                if response_checklist.status_code == 200:
+                                    dados_checklist = response_checklist.json()
+                                    if "result" in dados_checklist:
+                                        print(f"Checklist item '{item}' adicionado com sucesso para a tarefa ID {task_id_value}!")
+                                    else:
+                                        print(f"Erro ao adicionar checklist item '{item}': {dados_checklist}")
                                 else:
-                                    print(f"Erro ao adicionar checklist item '{item}': {dados_checklist}")
-                            else:
-                                print(f"Erro na API ao adicionar checklist. Status: {response_checklist.status_code}")
-                                print(f"Resposta completa: {response_checklist.text}")
+                                    print(f"Erro na API ao adicionar checklist. Status: {response_checklist.status_code}")
+                                    print(f"Resposta completa: {response_checklist.text}")
 
-                except ValueError:
-                    print(f"Erro: resposta não é um JSON válido. Resposta: {response.text}")
-            else:
-                print(f"Erro ao criar a tarefa. Status: {response.status_code}")
-        except Exception as e:
-            print(f"Erro ao criar o cartão: {str(e)}")
-            traceback.print_exc()
-
+                    except ValueError:
+                        print(f"Erro: resposta não é um JSON válido. Resposta: {response.text}")
+                else:
+                    print(f"Erro ao criar a tarefa. Status: {response.status_code}")
+            except Exception as e:
+                print(f"Erro ao criar o cartão: {str(e)}")
+                traceback.print_exc()
+    
     def exibirListaCartoes(self):
             title = ""
             #print(title)
