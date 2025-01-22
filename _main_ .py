@@ -130,9 +130,24 @@ class Aut_Cartao:
             title = ""
             #print(title)
             self.CentrodeCusto = self.CC.get()
-            self.AtualFase = self.Fase.get()  # Certifique-se de que é string
+            self.AtualFase = str(self.Fase.get())  # Certifique-se de que é string
             self.especialidadeValor = self.especialidade.get()
             self.referencia = self.equipSoft.get()
+            self.data_inicio_ = self.data_inicio.get_date()
+            self.data_fechamento_ = self.data_fechamento.get_date()
+            self.prazo_ = self.prazo.get_date()
+            self.responsavel_ = self.responsavel.get()
+
+            if self.colaborador:
+                self.id_selecionado.set(self.colaborador["id"])
+
+            if not isinstance(self.CentrodeCusto, str):
+                messagebox.showerror("Erro", "Centro de Custo deve ser uma string.")
+                return
+
+            if not isinstance(self.AtualFase, str):
+                messagebox.showerror("Erro", "Fase deve ser uma string.")
+                return
 
             if self.especialidadeValor == "Controle":
                 self.especialidadeValor = "ESW002-Software_Controle-SP"
@@ -141,12 +156,27 @@ class Aut_Cartao:
                 self.entrega = self.especialidade.get()
                 self.especialidadeValor = "ESW003-Software_Interface-SP"
 
+
+            description = f"E%23{self.entrega} R%23{self.referencia}"
+
             title = f"{self.CentrodeCusto}-FASE0{self.AtualFase}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
 
             self.card_titles.append(title)
-            print(self.card_titles)
             self.task_listbox.insert(tk.END, title)
 
+            self.fulltask = {
+                                "CREATED_BY": "1",
+                                "TITLE": title,
+                                "GROUP_ID": "2",
+                                "DESCRIPTION": description,
+                                "START_DATE_PLAN": self.data_inicio_,
+                                "END_DATE_PLAN": self.data_fechamento_,
+                                "DEADLINE": self.prazo_,
+                                "RESPONSIBLE_ID": "1"
+                            }
+            
+            self.task_vector.append(self.fulltask.copy())
+            print(self.task_vector)
 
     def tela(self):
         self.card_titles = []
@@ -171,6 +201,7 @@ class Aut_Cartao:
         self.telaContinuacao()
 
     def telaContinuacao(self):
+        self.task_vector = []
         if self.groupid == '796':
             self.listEquip = ["C01", "C02", "C03", "C04", "C05"]
         else:
@@ -233,14 +264,16 @@ class Aut_Cartao:
 
         # Botão para criar o cartão
         criar = ttk.Button(self.janela, text="Criar Cartão", command=self.criarCartao, width=20)
-        criar.place(x=650, y=410)
+        criar.place(x=360, y=310)
 
         exibir = ttk.Button(self.janela, text="Exibir Lista de Cartões", command=self.exibirListaCartoes, width=20)
-        exibir.place(x=650, y=460)
+        exibir.place(x=215, y=310)
 
-        tk.Label(self.janela, text="Tarefas Criadas:", font="Arial 10 bold", wraplength=500, anchor="w", justify="left").place(x=400, y=20)
-        self.task_listbox = tk.Listbox(self.janela, width=50, height=20) 
-        self.task_listbox.place(x=400, y=50)
+        tk.Label(self.janela, text="Tarefas Criadas:", font="Arial 10 bold", wraplength
+        
+        =500, anchor="w", justify="left").place(x=245, y=380)
+        self.task_listbox = tk.Listbox(self.janela, width=50, height=5) 
+        self.task_listbox.place(x=245, y=400)
 
 objeto = Aut_Cartao()
 objeto.tela()
