@@ -30,7 +30,7 @@ class Aut_Cartao:
         self.data_fechamento = self.data_fechamento.get_date()
         self.prazo = self.prazo.get_date()
         self.responsavel = self.responsavel.get()
-        
+
         if self.colaborador:
             self.id_selecionado.set(self.colaborador["id"])
 
@@ -49,9 +49,11 @@ class Aut_Cartao:
             self.entrega = self.especialidade.get()
             self.especialidadeValor = "ESW003-Software_Interface-SP"
 
+
         title = f"{self.CentrodeCusto}-FASE0{self.Fase}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
         description = f"E%23{self.entrega} R%23{self.referencia}"
         print(f"O ID selecionado foi: {self.id_selecionado.get()}")
+
 
         self.card_dict = {
             "CREATED_BY": "1",
@@ -125,38 +127,28 @@ class Aut_Cartao:
             traceback.print_exc()
 
     def exibirListaCartoes(self):
-        contagem =+1
-
-        if contagem < 2:
-
+            title = ""
+            #print(title)
             self.CentrodeCusto = self.CC.get()
             self.AtualFase = self.Fase.get()  # Certifique-se de que é string
             self.especialidadeValor = self.especialidade.get()
             self.referencia = self.equipSoft.get()
 
-
             if self.especialidadeValor == "Controle":
+                self.especialidadeValor = "ESW002-Software_Controle-SP"
                 self.entrega = "Software"
             else:
                 self.entrega = self.especialidade.get()
+                self.especialidadeValor = "ESW003-Software_Interface-SP"
 
-            self.card_titles = f"{self.CentrodeCusto}-FASE0{self.AtualFase}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
+            title = f"{self.CentrodeCusto}-FASE0{self.AtualFase}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
 
-            self.task_listbox.delete(0, tk.END)  # Limpar Listbox
-            for title in self.card_titles:
-                self.task_listbox.insert(tk.END, title)
+            self.card_titles.append(title)
+            print(self.card_titles)
+            self.task_listbox.insert(tk.END, title)
 
-            if self.card_titles:
-                lista_cartoes = "\n".join(self.card_titles)
-                messagebox.showinfo("Lista de Cartões", f"Títulos dos cartões criados:\n{lista_cartoes}")
-            else:
-                messagebox.showinfo("Lista de Cartões", "Nenhum cartão foi criado ainda.")
-
-        else:
-            print("Asteca")
 
     def tela(self):
-
         self.card_titles = []
         self.janela = ThemedTk(theme="winxpblue")
         self.janela.title("Criação de Cartões")
