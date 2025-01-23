@@ -175,7 +175,10 @@ class Aut_Cartao:
                                 "END_DATE_PLAN": self.data_fechamento_,
                                 "DEADLINE": self.prazo_,
                                 "RESPONSIBLE_ID": "1",
-                                "CHECKLIST": self.checklist_items
+                                "CHECKLIST": self.checklist_items,
+                                "ALLOW_TIME_TRACKING": "Y",
+                                "TIME_ESTIMATE": 100
+                                
                             }
 
             
