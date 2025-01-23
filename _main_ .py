@@ -67,11 +67,11 @@ class Aut_Cartao:
                 "RESPONSIBLE_ID": self.id_selecionado.get()
             }
             self.task_vector = [self.card_dict]
-
     # Iterar sobre self.task_vector para criar as tarefas
         for task in self.task_vector:
-
             try:
+                checklist_temp = task.pop("CHECKLIST", None)
+                # Remove a chave CHECKLIST da requisição inicial
                 print(f"Criando a tarefa: {task['TITLE']}")
                 url_tarefa = f"{urlAPI}/task.item.add.json?{criar_fields(task)}"
                 response = requests.get(url_tarefa)
@@ -83,13 +83,11 @@ class Aut_Cartao:
                         result = dadosTotal.get("result", {})
                         if isinstance(result, int):
                             task_id_value = result
-                            task_id_value = int(task_id_value)
                             print(f"Tarefa criada com sucesso. ID da tarefa: {task_id_value}")
 
-                        # Adicionar itens de checklist à tarefa criada
-                        for checklist in self.checklist_vector:
-                            if checklist == self.checklist_items:  # Filtra os itens específicos da entrega atual
-                                for item in checklist:
+                            # Adicionar itens de checklist à tarefa criada
+                            if checklist_temp is not None:  # Verifica se o checklist existe na tarefa
+                                for item in checklist_temp:
                                     checklist_dict = {
                                         "taskId": task_id_value,  # O Bitrix espera "taskId" no corpo
                                         "fields": {  # Campos adicionais dentro de "fields"
@@ -98,7 +96,7 @@ class Aut_Cartao:
                                     }
                                     url_checklist = f"{urlAPICheck}/task.checklistitem.add.json"
                                     response_checklist = requests.post(url_checklist, json=checklist_dict)
-                        
+
                                     if response_checklist.status_code == 200:
                                         dados_checklist = response_checklist.json()
                                         if "result" in dados_checklist:
@@ -109,15 +107,16 @@ class Aut_Cartao:
                                         print(f"Erro na API ao adicionar checklist. Status: {response_checklist.status_code}")
                                         print(checklist_dict)
                                         print(f"Resposta completa: {response_checklist.text}")
-
-
+                        else:
+                            print(f"Erro inesperado: resposta inválida ao criar a tarefa. Resposta: {dadosTotal}")
                     except ValueError:
                         print(f"Erro: resposta não é um JSON válido. Resposta: {response.text}")
                 else:
-                    print(f"Erro ao criar a tarefa. Status: {response.status_code}")
+                    print(f"Erro ao criar a tarefa. Status: {response.status_code}: {response.text}")
             except Exception as e:
                 print(f"Erro ao criar o cartão: {str(e)}")
                 traceback.print_exc()
+
     
     def exibirListaCartoes(self):
             title = ""
@@ -156,16 +155,6 @@ class Aut_Cartao:
             self.card_titles.append(title)
             self.task_listbox.insert(tk.END, title)
 
-            self.fulltask = {
-                                "CREATED_BY": "1",
-                                "TITLE": title,
-                                "GROUP_ID": "2",
-                                "DESCRIPTION": description,
-                                "START_DATE_PLAN": self.data_inicio_,
-                                "END_DATE_PLAN": self.data_fechamento_,
-                                "DEADLINE": self.prazo_,
-                                "RESPONSIBLE_ID": "1"
-                            }
             if self.entrega == "Software":
                 self.checklist_items = ["#501 - Estudo Tecnico", "#102 - Especificação", "#103 - Manual", 
                                                    "#104 - Tabela de Variaveis / Roteiro de Testes",  
@@ -176,6 +165,19 @@ class Aut_Cartao:
                 self.checklist_items = ["#501 - Estudo Tecnico", "#402 - Telas", "#403 - Drivers", "#404 - Bibliotecas", "#405 - Setup"]
             elif self.entrega == "G5":
                 self.checklist_items = ["#501 - Estudo Tecnico", "#302 - Bibliotecas", "#303 - Modelos de Escrita", "#304 - Instancia", "#305 - Teste Funcional"]
+
+            self.fulltask = {
+                                "CREATED_BY": "1",
+                                "TITLE": title,
+                                "GROUP_ID": "2",
+                                "DESCRIPTION": description,
+                                "START_DATE_PLAN": self.data_inicio_,
+                                "END_DATE_PLAN": self.data_fechamento_,
+                                "DEADLINE": self.prazo_,
+                                "RESPONSIBLE_ID": "1",
+                                "CHECKLIST": self.checklist_items
+                            }
+
             
             self.checklist_vector.append(self.checklist_items.copy())
             self.task_vector.append(self.fulltask.copy())
