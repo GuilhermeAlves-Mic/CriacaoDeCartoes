@@ -129,6 +129,7 @@ class Aut_Cartao:
             self.data_fechamento_ = self.data_fechamento.get_date()
             self.prazo_ = self.prazo.get_date()
             self.responsavel_ = self.responsavel.get()
+            self.tempoEstimado_ = float(self.tempoEstimado.get())
 
             if self.colaborador:
                 self.id_selecionado.set(self.colaborador["id"])
@@ -177,7 +178,7 @@ class Aut_Cartao:
                                 "RESPONSIBLE_ID": "1",
                                 "CHECKLIST": self.checklist_items,
                                 "ALLOW_TIME_TRACKING": "Y",
-                                "TIME_ESTIMATE": 100 
+                                "TIME_ESTIMATE": self.tempoEstimado_ * 3600
                             }
 
             self.checklist_vector.append(self.checklist_items.copy())
