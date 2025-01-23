@@ -177,11 +177,9 @@ class Aut_Cartao:
                                 "RESPONSIBLE_ID": "1",
                                 "CHECKLIST": self.checklist_items,
                                 "ALLOW_TIME_TRACKING": "Y",
-                                "TIME_ESTIMATE": 100
-                                
+                                "TIME_ESTIMATE": 100 
                             }
 
-            
             self.checklist_vector.append(self.checklist_items.copy())
             self.task_vector.append(self.fulltask.copy())
             print(self.task_vector)
@@ -249,41 +247,43 @@ class Aut_Cartao:
         self.especialidade = ttk.Combobox(self.janela, values=["Controle", "IHM", "Supervisão", "G5"], state="readonly")
         self.especialidade.place(x=130, y=141)
 
-        tk.Label(self.janela, text="Equipamento/Software: ", font="Arial 10 bold", padx=9).place(x=0, y=180)
+        tk.Label(self.janela, text="Tempo estimado: ", font="Arial 10 bold", padx=9).place(x=0, y=180) 
+        self.tempoEstimado = tk.Entry(self.janela, width=15, font="Arial 10")
+        self.tempoEstimado.place(x=132, y=180)
+
+        tk.Label(self.janela, text="Equipamento/Software: ", font="Arial 10 bold", padx=9).place(x=0, y=225)
         self.equipSoft = ttk.Combobox(self.janela, values=self.listEquip, width=35)
-        self.equipSoft.place(x=165, y=185)
-        tk.Label(self.janela, text="Data de inicio: ", font="Arial 10 bold", padx=9).place(x=0, y=222)
+        self.equipSoft.place(x=165, y=230)
+        tk.Label(self.janela, text="Data de inicio: ", font="Arial 10 bold", padx=9).place(x=0, y=267)
 
         self.data_inicio = DateEntry(self.janela, width=15, background='darkblue',
                    foreground='white', borderwidth=2, date_pattern='dd/MM/yyyy')
-        self.data_inicio.place(x=120, y=225)
+        self.data_inicio.place(x=120, y=270)
 
-        tk.Label(self.janela, text="Data de término: ", font="Arial 10 bold", padx=9).place(x=248, y=221)
+        tk.Label(self.janela, text="Data de término: ", font="Arial 10 bold", padx=9).place(x=248, y=266)
         self.data_fechamento = DateEntry(self.janela, width=15, background='darkblue',
                    foreground='white', borderwidth=2, date_pattern='dd/MM/yyyy')
-        self.data_fechamento.place(x=380, y=224)
+        self.data_fechamento.place(x=380, y=269)
 
-        tk.Label(self.janela, text="Prazo: ", font="Arial 10 bold", padx=9).place(x=525, y=221) 
+        tk.Label(self.janela, text="Prazo: ", font="Arial 10 bold", padx=9).place(x=525, y=266) 
         self.prazo = DateEntry(self.janela, width=15, background='darkblue',
                    foreground='white', borderwidth=2, date_pattern='dd/MM/yyyy')
-        self.prazo.place(x=595, y=223)
+        self.prazo.place(x=595, y=268)
 
-        tk.Label(self.janela, text="Responsável:", font="Arial 10 bold",padx=9).place(x=0, y=260)
+        tk.Label(self.janela, text="Responsável:", font="Arial 10 bold",padx=9).place(x=0, y=305)
         self.responsavel = ttk.Combobox(self.janela, values=self.nomes_colaboradores, width=20)
-        self.responsavel.place(x=120, y=260)
+        self.responsavel.place(x=120, y=306)
 
         # Botão para criar o cartão
         criar = ttk.Button(self.janela, text="Criar Cartão", command=self.criarCartao, width=20)
-        criar.place(x=360, y=310)
+        criar.place(x=360, y=355)
 
         exibir = ttk.Button(self.janela, text="Exibir Lista de Cartões", command=self.exibirListaCartoes, width=20)
-        exibir.place(x=215, y=310)
+        exibir.place(x=215, y=355)
 
-        tk.Label(self.janela, text="Tarefas Criadas:", font="Arial 10 bold", wraplength
-        
-        =500, anchor="w", justify="left").place(x=245, y=380)
+        tk.Label(self.janela, text="Tarefas Criadas:", font="Arial 10 bold", wraplength=500, anchor="w", justify="left").place(x=245, y=420)
         self.task_listbox = tk.Listbox(self.janela, width=50, height=5) 
-        self.task_listbox.place(x=245, y=400)
+        self.task_listbox.place(x=245, y=440)
 
 objeto = Aut_Cartao()
 objeto.tela()
