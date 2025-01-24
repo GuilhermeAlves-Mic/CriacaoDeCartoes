@@ -30,6 +30,8 @@ class Aut_Cartao:
         self.data_fechamentoo = self.data_fechamento.get_date()
         self.prazoo = self.prazo.get_date()
         self.responsavell = self.responsavel.get()
+        self.tempoEstimado_ = float(self.tempoEstimado.get())
+        self.cartaopai = int(self.parent_id.get())
 
         if self.colaborador:
             self.id_selecionado.set(self.colaborador["id"])
@@ -57,14 +59,18 @@ class Aut_Cartao:
             title = f"{self.CentrodeCusto}-FASE0{self.Fase}-{self.especialidadeValor}-{self.entrega}-{self.referencia}"
             description = f"E%23{self.entrega} R%23{self.referencia}"
             self.card_dict = {
-                "CREATED_BY": "1",
-                "TITLE": title,
-                "GROUP_ID": "2",
-                "DESCRIPTION": description,
-                "START_DATE_PLAN": self.data_inicioo,
-                "END_DATE_PLAN": self.data_fechamentoo,
-                "DEADLINE": self.prazoo,
-                "RESPONSIBLE_ID": self.id_selecionado.get()
+                            "CREATED_BY": "1",
+                            "TITLE": title,
+                            "GROUP_ID": "2",
+                            "DESCRIPTION": description,
+                            "START_DATE_PLAN": self.data_inicio_,
+                            "END_DATE_PLAN": self.data_fechamento_,
+                            "DEADLINE": self.prazo_,
+                            "RESPONSIBLE_ID": "1",
+                            "CHECKLIST": self.checklist_items,
+                            "ALLOW_TIME_TRACKING": "Y",
+                            "TIME_ESTIMATE": self.tempoEstimado_ * 3600,
+                            "PARENT_ID": self.cartaopai
             }
             self.task_vector = [self.card_dict]
     # Iterar sobre self.task_vector para criar as tarefas
@@ -130,6 +136,7 @@ class Aut_Cartao:
             self.prazo_ = self.prazo.get_date()
             self.responsavel_ = self.responsavel.get()
             self.tempoEstimado_ = float(self.tempoEstimado.get())
+            self.cartaopai = int(self.parent_id.get())
 
             if self.colaborador:
                 self.id_selecionado.set(self.colaborador["id"])
@@ -178,7 +185,8 @@ class Aut_Cartao:
                                 "RESPONSIBLE_ID": "1",
                                 "CHECKLIST": self.checklist_items,
                                 "ALLOW_TIME_TRACKING": "Y",
-                                "TIME_ESTIMATE": self.tempoEstimado_ * 3600
+                                "TIME_ESTIMATE": self.tempoEstimado_ * 3600,
+                                "PARENT_ID": self.cartaopai
                             }
 
             self.checklist_vector.append(self.checklist_items.copy())
@@ -212,9 +220,23 @@ class Aut_Cartao:
         self.checklist_vector = []
         self.task_vector = []
         if self.groupid == '796':
-            self.listEquip = ["C01", "C02", "C03", "C04", "C05"]
+            self.listEquip = ["C01", "C02", "C03", "C04", "C05", "MM", "TRAFO", "NB", "Gerador", "Relé de Proteção", "Relé Térmico",
+                                "Medidor de Concessionária", "Medidor de Qualidade", "Chiller", "Termostato",
+                                "HVAC", "SENSOR", "CLP", "IO REMOTO", "Hidrômetro", "Disjuntor", "ATS",
+                                "Banco de Baterias", "Retificador"]
         else:
-            self.listEquip = ["ARESET", "AHUMGR", "CLGMGR", "CTRMGR"]
+            self.listEquip = ["ARESET", "AHUMGR", "CLGMGR", "PUMPMGR", "RAS", "APRESET", "WTRSTGMGR",
+                                "AHU", "CWBPV", "ACC", "CHRMMON", "COLOMAU", "COMPRESSOR", "CA", "CHWSTR",
+                                "CHWBT", "CT", "CRAC", "CRAH", "D2SD", "DXUNIT", "FAN", "HDAC", "HX",
+                                "HUM", "HUMUNITARY", "RMDMPR", "SUMP", "VLV2POS", "VLVMOD", "VFD", "VAV",
+                                "VRF", "VRFOD", "ANALOGSENSOR", "GWM", "WHUMIDITY", "WTEMPERATURE",
+                                "HAZGAS", "MISCALARMS", "METRICS", "WLPRESSURE", "WLHUMIDITY",
+                                "WLTEMPERATURE", "WSTN", "FS", "LEAK", "VESDA", "ALHB", "RIO", "MECATS",
+                                "PLCMON", "PLCNET", "REMIOMON", "VENDSWBUSDT", "GSB", "GRMU", "LVSB",
+                                "MVSW", "MVTB", "MLTX", "PUSP", "RMU", "SUSP", "SUDB", "Utility Power",
+                                "ZZRMU", "DPM", "LVDB", "LVCBM", "MVCB", "MVCBM", "PQM", "MVPLC", "MVUN",
+                                "FBULK", "FDAY", "FFIL", "FPO", "GEN", "FC", "PV", "ATS", "MECHATS",
+                                "DC Plant", "PDU", "STS", "UPS"]
         
         self.colaboradores = [
                                 {"id": 498, "nome": "Guilherme Alves"},
@@ -248,6 +270,10 @@ class Aut_Cartao:
         self.especialidade = ttk.Combobox(self.janela, values=["Controle", "IHM", "Supervisão", "G5"], state="readonly")
         self.especialidade.place(x=130, y=141)
 
+        tk.Label(self.janela, text="Cartão Pai: ", font="Arial 10 bold", padx=9).place(x=268, y=138)
+        self.parent_id = tk.Entry(self.janela,  width=15, font="Arial 10")
+        self.parent_id.place(x=360, y=140)
+
         tk.Label(self.janela, text="Tempo estimado: ", font="Arial 10 bold", padx=9).place(x=0, y=180) 
         self.tempoEstimado = tk.Entry(self.janela, width=15, font="Arial 10")
         self.tempoEstimado.place(x=132, y=180)
@@ -279,12 +305,12 @@ class Aut_Cartao:
         criar = ttk.Button(self.janela, text="Criar Cartão", command=self.criarCartao, width=20)
         criar.place(x=360, y=355)
 
-        exibir = ttk.Button(self.janela, text="Exibir Lista de Cartões", command=self.exibirListaCartoes, width=20)
-        exibir.place(x=215, y=355)
+        addLista = ttk.Button(self.janela, text="Adicionar a Lista", command=self.exibirListaCartoes, width=20)
+        addLista.place(x=215, y=355)
 
-        tk.Label(self.janela, text="Tarefas Criadas:", font="Arial 10 bold", wraplength=500, anchor="w", justify="left").place(x=245, y=420)
-        self.task_listbox = tk.Listbox(self.janela, width=50, height=5) 
-        self.task_listbox.place(x=245, y=440)
+        tk.Label(self.janela, text="Tarefas:", font="Arial 10 bold", wraplength=500, anchor="w", justify="left").place(x=325, y=400)
+        self.task_listbox = tk.Listbox(self.janela, width=75, height=5, background="#F0F0F0", borderwidth=0) 
+        self.task_listbox.place(x=195, y=430)
 
 objeto = Aut_Cartao()
 objeto.tela()
