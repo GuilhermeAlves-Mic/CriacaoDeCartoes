@@ -30,8 +30,9 @@ class Aut_Cartao:
         self.data_fechamentoo = self.data_fechamento.get_date()
         self.prazoo = self.prazo.get_date()
         self.responsavell = self.responsavel.get()
-        self.tempoEstimado_ = float(self.tempoEstimado.get())
-        self.cartaopai = int(self.parent_id.get())
+        self.tempoEstimado_ = float(self.tempoEstimado.get()) if self.tempoEstimado.get() != '' else 0
+        self.cartaopai = int(self.parent_id.get()) if self.parent_id.get() != '' else 0
+        self.eixo_ = str(self.eixo.get())
 
         if self.colaborador:
             self.id_selecionado.set(self.colaborador["id"])
@@ -135,8 +136,10 @@ class Aut_Cartao:
             self.data_fechamento_ = self.data_fechamento.get_date()
             self.prazo_ = self.prazo.get_date()
             self.responsavel_ = self.responsavel.get()
-            self.tempoEstimado_ = float(self.tempoEstimado.get())
-            self.cartaopai = int(self.parent_id.get())
+            self.tempoEstimado_ = float(self.tempoEstimado.get()) if self.tempoEstimado.get() != '' else 0
+            self.cartaopai = int(self.parent_id.get()) if self.parent_id.get() != '' else 0
+            self.eixo_ = str(self.eixo.get())
+            self.UF_ = self.UF.get()
 
             if self.colaborador:
                 self.id_selecionado.set(self.colaborador["id"])
@@ -186,7 +189,8 @@ class Aut_Cartao:
                                 "CHECKLIST": self.checklist_items,
                                 "ALLOW_TIME_TRACKING": "Y",
                                 "TIME_ESTIMATE": self.tempoEstimado_ * 3600,
-                                "PARENT_ID": self.cartaopai
+                                "PARENT_ID": self.cartaopai,
+                                "TAGS": f"{self.eixo_}, {self.UF_}"
                             }
 
             self.checklist_vector.append(self.checklist_items.copy())
@@ -261,6 +265,14 @@ class Aut_Cartao:
         self.CC = tk.Entry(self.janela, width=15, font="Arial 10")
         self.CC.place(x=130, y=61)
 
+        tk.Label(self.janela, text="Eixo: ", font="Arial 10 bold", padx=9).place(x=268, y=60)
+        self.eixo = (ttk.Combobox(self.janela, values=["A1", "A2", "CAG", "DC"], width=10, state="readonly"))
+        self.eixo.place(x=360,y=63)
+
+        tk.Label(self.janela, text="UF: ", font="Arial 10 bold", padx=9).place(x=465, y=60)
+        self.UF = (ttk.Combobox(self.janela, values=["SP", "RJ"], width=10, state="readonly"))
+        self.UF.place(x=510, y=62)
+
         # Campos para Fase, Especialidade, Equipamento/Software, e Data
         tk.Label(self.janela, text="Fase: ", font="Arial 10 bold", padx=9).place(x=0, y=100)
         self.Fase = tk.Entry(self.janela, width=15, font="Arial 10")
@@ -280,7 +292,7 @@ class Aut_Cartao:
 
         tk.Label(self.janela, text="Equipamento/Software: ", font="Arial 10 bold", padx=9).place(x=0, y=225)
         self.equipSoft = ttk.Combobox(self.janela, values=self.listEquip, width=35)
-        self.equipSoft.place(x=165, y=230)
+        self.equipSoft.place(x=165, y=228)
         tk.Label(self.janela, text="Data de inicio: ", font="Arial 10 bold", padx=9).place(x=0, y=267)
 
         self.data_inicio = DateEntry(self.janela, width=15, background='darkblue',
